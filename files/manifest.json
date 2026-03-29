@@ -3,7 +3,7 @@
   "name": "DSA GitHub Pusher",
   "version": "1.0.0",
   "description": "Auto-push accepted DSA solutions to your GitHub repo from LeetCode and more.",
-  "permissions": ["storage", "notifications", "tabs"],
+  "permissions": ["storage", "notifications"],
   "host_permissions": [
     "https://leetcode.com/*",
     "https://www.geeksforgeeks.org/*",
@@ -15,17 +15,21 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://leetcode.com/*"],
+      "matches": ["https://leetcode.com/problems/*"],
       "js": ["content_leetcode.js"],
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://www.geeksforgeeks.org/*"],
+      "matches": ["https://www.geeksforgeeks.org/problems/*"],
       "js": ["content_gfg.js"],
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://codeforces.com/*"],
+      "matches": [
+        "https://codeforces.com/problemset/problem/*/*",
+        "https://codeforces.com/contest/*/problem/*",
+        "https://codeforces.com/contest/*/my"
+      ],
       "js": ["content_cf.js"],
       "run_at": "document_idle"
     }

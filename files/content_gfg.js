@@ -9,15 +9,20 @@
   console.log("[DSA Pusher] GFG content script loaded.");
 
   // GFG shows a result div after submission — watch for DOM changes
+  let lastHandledText = ""; // prevent double-firing on same result
+
   const observer = new MutationObserver(() => {
-    // GFG shows "Problem Solved Successfully" or similar text
     const resultEl =
       document.querySelector(".problems_header_feedback__C_sou") ||
-      document.querySelector('[class*="feedback"]') ||
+      document.querySelector('[class*="problems_header_feedback"]') ||
       document.querySelector(".result_box");
 
-    if (resultEl && resultEl.textContent.toLowerCase().includes("success")) {
-      observer.disconnect(); // stop watching after first detection
+    if (
+      resultEl &&
+      resultEl.textContent.toLowerCase().includes("success") &&
+      resultEl.textContent !== lastHandledText
+    ) {
+      lastHandledText = resultEl.textContent;
       handleAccepted();
     }
   });
@@ -29,8 +34,7 @@
 
     const title =
       document.querySelector(".problems_header_description__t_MIg h3")
-        ?.textContent ||
-      document.title.replace("- GeeksForGeeks", "").trim();
+        ?.textContent || document.title.replace("- GeeksForGeeks", "").trim();
 
     const difficulty =
       document.querySelector(".difficulty_level")?.textContent?.trim() ||
@@ -43,8 +47,10 @@
       if (cm) code = cm.getValue();
     } catch (_) {}
 
-    const langEl = document.querySelector(".active_lang") ||
-      document.querySelector('[class*="language"]');
+    const langEl =
+      document.querySelector(".active_lang") ||
+      document.querySelector('[class*="active_lang"]') ||
+      document.querySelector('[class*="languageButton--selected"]');
     const language = langEl?.textContent?.trim().toLowerCase() || "cpp";
 
     const payload = {

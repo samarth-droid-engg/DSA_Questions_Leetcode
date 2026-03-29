@@ -67,20 +67,34 @@
   }
 
   async function fetchCFSubmissionCode(submissionId, problemHref) {
-    // Extract contest ID from problem href
-    const match = problemHref.match(/\/contest\/(\d+)\//);
-    const contestId = match?.[1];
-    if (!contestId) return "// Could not fetch code.";
+    // Handle both URL formats:
+    // /contest/1234/problem/A  → /contest/1234/submission/submissionId
+    // /problemset/problem/1234/A → same contest URL pattern
+
+    let contestId = null;
+
+    const contestMatch = problemHref.match(/\/contest\/(\d+)\//);
+    if (contestMatch) {
+      contestId = contestMatch[1];
+    } else {
+      // /problemset/problem/CONTESTID/PROBLEMID
+      const problemsetMatch = problemHref.match(
+        /\/problemset\/problem\/(\d+)\//,
+      );
+      if (problemsetMatch) contestId = problemsetMatch[1];
+    }
+
+    if (!contestId) return "// Could not fetch code — unknown URL format.";
 
     try {
       const url = `https://codeforces.com/contest/${contestId}/submission/${submissionId}`;
       const res = await fetch(url, { credentials: "include" });
+      if (!res.ok) return "// Could not fetch submission page.";
       const html = await res.text();
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, "text/html");
-      // CF shows the code in a <pre id="program-source-text">
       const pre = doc.querySelector("#program-source-text");
-      return pre?.textContent || "// Could not extract code.";
+      return pre?.textContent?.trim() || "// Could not extract code.";
     } catch (_) {
       return "// Could not extract code.";
     }

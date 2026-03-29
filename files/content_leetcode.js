@@ -12,59 +12,49 @@
 
   console.log("[DSA Pusher] LeetCode content script loaded.");
 
-  // ─── Intercept fetch ───────────────────────────────────────────────────────
-  const originalFetch = window.fetch;
+  // ─── Intercept fetch (SAFE version) ───────────────────────────────────────
+  // Only intercept the specific submission check endpoint.
+  // Everything else (OAuth, login, GraphQL, etc.) passes through UNTOUCHED.
+  const originalFetch = window.fetch.bind(window);
 
   window.fetch = async function (...args) {
-    const response = await originalFetch.apply(this, args);
-    const url = typeof args[0] === "string" ? args[0] : args[0]?.url || "";
+    // Always call original first — we never block or modify any request
+    const response = await originalFetch(...args);
 
-    // LeetCode polls this endpoint to check submission result
-    if (url.includes("/submissions/detail/") && url.includes("/check")) {
-      const clone = response.clone();
-      clone
-        .json()
-        .then((data) => {
-          if (data?.status_msg === "Accepted") {
-            console.log("[DSA Pusher] ✅ Accepted submission detected!", data);
-            handleAcceptedSubmission(data, url);
-          }
-        })
-        .catch(() => {}); // silently ignore parse errors
+    try {
+      const url =
+        typeof args[0] === "string"
+          ? args[0]
+          : args[0] instanceof Request
+            ? args[0].url
+            : "";
+
+      // ONLY intercept LeetCode submission check polling — nothing else
+      const isSubmissionCheck =
+        url.includes("/submissions/detail/") && url.includes("/check");
+
+      if (isSubmissionCheck && response.ok) {
+        // Clone ONLY for this specific case; original response returned untouched
+        const clone = response.clone();
+        clone
+          .json()
+          .then((data) => {
+            if (data?.status_msg === "Accepted") {
+              console.log("[DSA Pusher] ✅ Accepted!", data);
+              handleAcceptedSubmission(data, url);
+            }
+          })
+          .catch(() => {});
+      }
+    } catch (_) {
+      // Any error in our code must NOT affect the original response
     }
 
-    return response;
+    return response; // always return original, unmodified
   };
 
-  // ─── Also intercept XMLHttpRequest (fallback) ──────────────────────────────
-  const OrigXHR = window.XMLHttpRequest;
-  window.XMLHttpRequest = function () {
-    const xhr = new OrigXHR();
-    const originalOpen = xhr.open.bind(xhr);
-    let requestUrl = "";
-
-    xhr.open = function (method, url, ...rest) {
-      requestUrl = url;
-      return originalOpen(method, url, ...rest);
-    };
-
-    xhr.addEventListener("load", function () {
-      if (
-        requestUrl.includes("/submissions/detail/") &&
-        requestUrl.includes("/check")
-      ) {
-        try {
-          const data = JSON.parse(xhr.responseText);
-          if (data?.status_msg === "Accepted") {
-            console.log("[DSA Pusher] ✅ Accepted (XHR)!", data);
-            handleAcceptedSubmission(data, requestUrl);
-          }
-        } catch (_) {}
-      }
-    });
-
-    return xhr;
-  };
+  // NOTE: XHR override removed — it was interfering with Google login/OAuth.
+  // The fetch interceptor above is sufficient for LeetCode's submission polling.
 
   // ─── Handle accepted submission ────────────────────────────────────────────
   function handleAcceptedSubmission(data, checkUrl) {
@@ -137,7 +127,9 @@
 
     // Try to get problem description (first 300 chars for README)
     let description = "";
-    const descEl = document.querySelector('[data-track-load="description_content"]');
+    const descEl = document.querySelector(
+      '[data-track-load="description_content"]',
+    );
     if (descEl) {
       description = descEl.textContent.slice(0, 400).trim() + "...";
     }
@@ -175,7 +167,7 @@
     try {
       const res = await originalFetch(
         `https://leetcode.com/submissions/detail/${submissionId}/`,
-        { credentials: "include" }
+        { credentials: "include" },
       );
       const html = await res.text();
       // LC embeds submission data in a <script> tag as JSON
@@ -199,7 +191,10 @@
       { type: "PUSH_TO_GITHUB", payload },
       (response) => {
         if (chrome.runtime.lastError) {
-          console.error("[DSA Pusher] Message error:", chrome.runtime.lastError);
+          console.error(
+            "[DSA Pusher] Message error:",
+            chrome.runtime.lastError,
+          );
           return;
         }
         if (response?.success) {
@@ -209,7 +204,7 @@
           console.error("[DSA Pusher] Push failed:", response?.error);
           showToast("❌ Push failed: " + (response?.error || "Unknown error"));
         }
-      }
+      },
     );
   }
 
