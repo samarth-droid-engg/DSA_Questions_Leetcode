@@ -3,11 +3,7 @@
   "name": "DSA GitHub Pusher",
   "version": "1.0.0",
   "description": "Auto-push accepted DSA solutions to your GitHub repo from LeetCode and more.",
-  "permissions": [
-    "storage",
-    "notifications",
-    "tabs"
-  ],
+  "permissions": ["storage", "notifications", "tabs"],
   "host_permissions": [
     "https://leetcode.com/*",
     "https://www.geeksforgeeks.org/*",
