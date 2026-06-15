@@ -1,13 +1,13 @@
 class Solution {
 public:
-    void solve(vector<string>& st, string digits, string ans,
-               unordered_map<int, string>& mp, int index) {
+    void solve(vector<string>& st, const string& digits, string& ans,
+               const unordered_map<int, string>& mp, int index) {
         if (index == digits.length()) {
             st.push_back(ans);
             return;
         }
         int n = digits[index] - '0';
-        string p = mp[n];
+        const string& p = mp.at(n);
         for (int i = 0; i < p.length(); i++) {
             ans += p[i];
             solve(st, digits, ans, mp, index + 1);
@@ -15,6 +15,7 @@ public:
         }
     }
     vector<string> letterCombinations(string digits) {
+        if(digits.empty()) return {};
         unordered_map<int, string> mp;
         char ch = 'a';
         for (int i = 2; i <= 9; i++) {
@@ -33,7 +34,8 @@ public:
             ch++;
         }
         vector<string> st;
-        solve(st, digits, "", mp, 0);
+        string ans = "";
+        solve(st, digits, ans, mp, 0);
         return st;
     }
 };
