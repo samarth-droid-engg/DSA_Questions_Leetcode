@@ -13,13 +13,17 @@ public:
             return;
         }
         // exclude(closed)
-        ans += ')';
-        solve(st, ans, n, obrC, cbrC + 1);
-        ans.pop_back();
+        if (cbrC < obrC) {
+            ans += ')';
+            solve(st, ans, n, obrC, cbrC + 1);
+            ans.pop_back();
+        }
         // include(open)
-        ans += '(';
-        solve(st, ans, n, obrC + 1, cbrC);
-        ans.pop_back();
+        if (obrC < n) {
+            ans += '(';
+            solve(st, ans, n, obrC + 1, cbrC);
+            ans.pop_back();
+        }
     }
     vector<string> generateParenthesis(int n) {
         vector<string> st;
