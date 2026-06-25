@@ -10,14 +10,19 @@
  */
 class Solution {
 public:
-    ListNode* reverseList(ListNode* head) {
-        if (head == NULL || head->next == NULL) {
-            return head;
+    ListNode* solve(ListNode* curr, ListNode* prev) {
+        if (curr == NULL) {
+            return prev;
         }
-        ListNode* newHead = reverseList(head->next); //Ye cll karega base case tk
-        ListNode* front = head->next;
-        front->next = head;
-        head->next = NULL;
-        return newHead;
+        ListNode* temp = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = temp;
+        return solve(curr, prev);
+    }
+    ListNode* reverseList(ListNode* head) {
+        ListNode* prev = NULL;
+        ListNode* curr = head;
+        return solve(curr, prev);
     }
 };
