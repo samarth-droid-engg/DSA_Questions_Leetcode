@@ -8,17 +8,30 @@
  */
 class Solution {
 public:
-    ListNode* detectCycle(ListNode* head) {
-        // Approach:Use of set, better from map saving some space
-        unordered_set<ListNode*> visited;
-        ListNode* temp = head;
-        while (temp != nullptr) {
-            if (visited.count(temp)) {
-                return temp;
+    bool isCyclePresent(ListNode*& head, ListNode*& meet) {
+        ListNode* slow = head;
+        ListNode* fast = head;
+        while (fast != NULL && fast->next != NULL) {
+            slow = slow->next;
+            fast = fast->next->next;
+            if (slow == fast) {
+                meet = slow;
+                return true;
             }
-            visited.insert(temp);
-            temp = temp->next;
         }
-        return nullptr;
+        return false;
+    }
+    ListNode* detectCycle(ListNode* head) {
+        ListNode* meet = NULL;
+        if (!isCyclePresent(head, meet))
+            return NULL;
+        ListNode* fast = head;
+        while (fast != NULL) {
+            if (fast == meet)
+                return fast;
+            fast = fast->next;
+            meet = meet->next;
+        }
+        return NULL;
     }
 };
