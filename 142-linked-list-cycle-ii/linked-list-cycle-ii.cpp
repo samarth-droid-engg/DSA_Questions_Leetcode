@@ -8,21 +8,16 @@
  */
 class Solution {
 public:
-    ListNode *detectCycle(ListNode *head) {
-        //Approach:Use of maps
-        unordered_map<ListNode*, bool> visited;
+    ListNode* detectCycle(ListNode* head) {
+        // Approach:Use of set, better from map saving some space
+        unordered_set<ListNode*> visited;
         ListNode* temp = head;
-        while(temp!=nullptr){
-            if(visited[temp]){
-                ListNode* newNode = temp;
-                temp = temp->next;
-                newNode->next=NULL;
-                return newNode;
+        while (temp != nullptr) {
+            if (visited.count(temp)) {
+                return temp;
             }
-            else{
-                visited[temp] = true;
-                temp = temp->next;
-            }
+            visited.insert(temp);
+            temp = temp->next;
         }
         return nullptr;
     }
