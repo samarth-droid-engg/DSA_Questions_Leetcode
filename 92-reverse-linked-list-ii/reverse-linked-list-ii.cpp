@@ -10,69 +10,35 @@
  */
 class Solution {
 public:
-    ListNode* reverse(ListNode* head) {
-        ListNode* prev = NULL;
-        ListNode* curr = head;
+    ListNode* reverseBetween(ListNode* head, int left, int right) {
+        if (!head || left == right) {
+            return head;
+        }
+        ListNode dummy(0);
+        dummy.next = head;
 
-        while (curr != NULL) {
+        ListNode* prev = &dummy;
+
+        // Move prev to node before left
+        for (int i = 1; i < left; i++) {
+            prev = prev->next;
+        }
+        ListNode* curr = prev->next;
+        ListNode* tail = curr;
+        ListNode* prevNode = NULL;
+
+        // Reverse right-left+1 nodes
+        for (int i = 0; i <= right - left; i++) {
             ListNode* forward = curr->next;
-            curr->next = prev;
-            prev = curr;
+            curr->next = prevNode;
+            prevNode = curr;
             curr = forward;
         }
 
-        return prev;
-    }
+        // Reconnect
+        prev->next = prevNode;
+        tail->next = curr;
 
-    ListNode* reverseBetween(ListNode* head, int left, int right) {
-
-        if (head == NULL || left == right)
-            return head;
-
-        ListNode* leftPrev = NULL;
-        ListNode* leftNode = NULL;
-        ListNode* rightNode = NULL;
-        ListNode* rightNext = NULL;
-
-        ListNode* temp = head;
-        int pos = 1;
-
-        while (temp != NULL) {
-
-            if (pos == left - 1)
-                leftPrev = temp;
-
-            if (pos == left)
-                leftNode = temp;
-
-            if (pos == right) {
-                rightNode = temp;
-                rightNext = temp->next;
-                break;
-            }
-
-            temp = temp->next;
-            pos++;
-        }
-
-        // Detach the sublist
-        if (leftPrev != NULL)
-            leftPrev->next = NULL;
-
-        rightNode->next = NULL;
-
-        // Reverse detached list
-        ListNode* newHead = reverse(leftNode);
-
-        // Attach back
-        if (leftPrev != NULL)
-            leftPrev->next = newHead;
-        else
-            head = newHead;
-
-        // leftNode becomes the tail after reversal
-        leftNode->next = rightNext;
-
-        return head;
+        return dummy.next;
     }
 };
