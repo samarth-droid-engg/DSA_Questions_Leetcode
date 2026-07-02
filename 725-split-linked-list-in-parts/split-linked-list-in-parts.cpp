@@ -27,15 +27,12 @@ public:
         for (int i = 0; i < k && temp != NULL; i++) {
             ans[i] = temp;
             int actualPartSize = idealPartSize + (extraNodes-- > 0 ? 1 : 0);
-            ListNode* vec = ans[i];
             for (int j = 1; j < actualPartSize; j++) {
-                vec->next = temp->next;
-                temp = temp->next;
-                vec = vec->next;
+                temp = temp->next; 
             }
-            if (temp != NULL)
-                temp = temp->next;
-            vec->next = NULL;
+            ListNode* nextP = temp->next;
+            temp->next = NULL;
+            temp = nextP;
         }
         return ans;
     }
