@@ -1,17 +1,108 @@
 class Solution {
 public:
-    long long subArrayRanges(vector<int>& nums) {
-        int n = nums.size();
-        long long sum = 0;
-        for (int i = 0; i < n; i++) {
-            int minE = INT_MAX;
-            int maxE = INT_MIN;
-            for (int j = i; j < n; j++) {
-                minE = min(minE, nums[j]);
-                maxE = max(maxE, nums[j]);
-                sum += (maxE - minE);
+    vector<int> nextSmaller(vector<int>& arr) {
+        stack<int> st;
+        vector<int> v;
+        int n = arr.size();
+        for (int i = n - 1; i >= 0; i--) {
+            while (!st.empty() && arr[st.top()] >= arr[i]) {
+                st.pop();
             }
+            if (st.empty()) {
+                v.push_back(n);
+            } else {
+                v.push_back(st.top());
+            }
+            st.push(i);
+        }
+        reverse(v.begin(), v.end());
+        return v;
+    }
+    vector<int> prevSmaller(vector<int>& arr) {
+        stack<int> st;
+        vector<int> v;
+        int n = arr.size();
+        for (int i = 0; i < n; i++) {
+            while (!st.empty() && arr[st.top()] > arr[i]) {
+                st.pop();
+            }
+            if (st.empty()) {
+                v.push_back(-1);
+            } else {
+                v.push_back(st.top());
+            }
+            st.push(i);
+        }
+        return v;
+    }
+    vector<int> nextGreater(vector<int>& arr) {
+        stack<int> st;
+        vector<int> v;
+        int n = arr.size();
+        for (int i = n - 1; i >= 0; i--) {
+            while (!st.empty() && arr[st.top()] <= arr[i]) {
+                st.pop();
+            }
+            if (st.empty()) {
+                v.push_back(n);
+            } else {
+                v.push_back(st.top());
+            }
+            st.push(i);
+        }
+        reverse(v.begin(), v.end());
+        return v;
+    }
+    vector<int> prevGreater(vector<int>& arr) {
+        stack<int> st;
+        vector<int> v;
+        int n = arr.size();
+        for (int i = 0; i < n; i++) {
+            while (!st.empty() && arr[st.top()] < arr[i]) {
+                st.pop();
+            }
+            if (st.empty()) {
+                v.push_back(-1);
+            } else {
+                v.push_back(st.top());
+            }
+            st.push(i);
+        }
+        return v;
+    }
+    long long minSubArraySum(vector<int>& arr) {
+        auto next = nextSmaller(arr);
+        auto prev = prevSmaller(arr);
+        long long sum = 0;
+        int n = arr.size();
+        for (int i = 0; i < n; i++) {
+            long long left = i - prev[i];
+            long long right = next[i] - i;
+
+            long long contribution = (arr[i] * left) * right;
+
+            sum = (sum + contribution);
         }
         return sum;
+    }
+    long long maxSubArraySum(vector<int>& arr) {
+        auto next = nextGreater(arr);
+        auto prev = prevGreater(arr);
+        long long sum = 0;
+        int n = arr.size();
+        for (int i = 0; i < n; i++) {
+            long long left = i - prev[i];
+            long long right = next[i] - i;
+
+            long long contribution = (arr[i] * left) * right;
+
+            sum = (sum + contribution);
+        }
+        return sum;
+    }
+    long long subArrayRanges(vector<int>& nums) {
+        auto minSum = minSubArraySum(nums);
+        auto maxSum = maxSubArraySum(nums);
+        return maxSum - minSum;
     }
 };
