@@ -2,6 +2,7 @@ class Solution {
 public:
     int canCompleteCircuit(vector<int>& gas, vector<int>& cost) {
         int n = gas.size();
+        //Hum yeh check kr rhe h ki total +ve h ke nahi bass yehi.
 
         int total = 0;
         int tank = 0;
