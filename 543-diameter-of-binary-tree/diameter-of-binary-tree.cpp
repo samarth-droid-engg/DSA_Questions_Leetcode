@@ -12,24 +12,19 @@
  */
 class Solution {
 public:
-    int maxDepth(TreeNode* root) {
-        if (root == NULL)
-            return 0;
-
-        int leftHeight = maxDepth(root->left) + 1;
-        int rightHeight = maxDepth(root->right) + 1;
-
-        return max(leftHeight, rightHeight);
-    }
-    int diameterOfBinaryTree(TreeNode* root) {
+    int diameter(TreeNode* root, int& maxiAns) {
         if (root == NULL) {
             return 0;
         }
-        int option1 = maxDepth(root->left) +
-                      maxDepth(root->right); // Isme h root aur LST aur RST
-        int option2 = diameterOfBinaryTree(root->left);
-        int option3 = diameterOfBinaryTree(root->right);
-        int maxHeight = max(option1, max(option2, option3));
-        return maxHeight;
+        int lh = diameter(root->left, maxiAns);
+        int rh = diameter(root->right, maxiAns);
+
+        maxiAns = max(maxiAns, lh + rh);
+        return 1 + max(lh, rh);
+    }
+    int diameterOfBinaryTree(TreeNode* root) {
+        int maxiAns = INT_MIN;
+        diameter(root, maxiAns);
+        return maxiAns;
     }
 };
