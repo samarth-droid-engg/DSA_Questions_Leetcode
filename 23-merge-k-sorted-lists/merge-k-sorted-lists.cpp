@@ -10,28 +10,45 @@
  */
 class Solution {
 public:
+    ListNode* mergeTwoLists(ListNode* a, ListNode* b) {
+        ListNode dummy(-1);
+        ListNode* temp = &dummy;
+
+        while (a && b) {
+            if (a->val <= b->val) {
+                temp->next = a;
+                a = a->next;
+            } else {
+                temp->next = b;
+                b = b->next;
+            }
+            temp = temp->next;
+        }
+
+        if (a)
+            temp->next = a;
+        else
+            temp->next = b;
+
+        return dummy.next;
+    }
+
+    ListNode* merge(vector<ListNode*>& lists, int left, int right) {
+        if (left == right)
+            return lists[left];
+
+        int mid = left + (right - left) / 2;
+
+        ListNode* l1 = merge(lists, left, mid);
+        ListNode* l2 = merge(lists, mid + 1, right);
+
+        return mergeTwoLists(l1, l2);
+    }
+
     ListNode* mergeKLists(vector<ListNode*>& lists) {
-        int sz = lists.size();
-        if (sz == 0)
+        if (lists.empty())
             return NULL;
-        priority_queue<pair<int, ListNode*>, vector<pair<int, ListNode*>>,
-                       greater<pair<int, ListNode*>>>
-            pq;
-        for (int i = 0; i < sz; i++) {
-            if (lists[i] != NULL) {
-                pq.push({lists[i]->val, lists[i]});
-            }
-        }
-        ListNode* dummy = new ListNode(-1);
-        ListNode* temp = dummy;
-        while (!pq.empty()) {
-            dummy->next = pq.top().second;
-            dummy = dummy->next;
-            pq.pop();
-            if (dummy->next != NULL) {
-                pq.push({dummy->next->val, dummy->next});
-            }
-        }
-        return temp->next;
+
+        return merge(lists, 0, lists.size() - 1);
     }
 };
