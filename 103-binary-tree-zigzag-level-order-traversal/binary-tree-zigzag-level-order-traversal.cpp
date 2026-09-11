@@ -24,34 +24,22 @@ public:
         while (!q.empty()) {
             vector<int> temp;
             int sz = q.size();
-            if (flag) {
-                for (int i = 0; i < sz; i++) {
-                    TreeNode* curr = q.front();
-                    temp.push_back(curr->val);
-                    q.pop();
-                    if (curr->left != NULL) {
-                        q.push(curr->left);
-                    }
-                    if (curr->right != NULL) {
-                        q.push(curr->right);
-                    }
+            // if (flag) {
+            for (int i = 0; i < sz; i++) {
+                TreeNode* curr = q.front();
+                temp.push_back(curr->val);
+                q.pop();
+                if (curr->left != NULL) {
+                    q.push(curr->left);
                 }
-                flag = 0;
-            } else {
-                for (int i = 0; i < sz; i++) {
-                    TreeNode* curr = q.front();
-                    temp.push_back(curr->val);
-                    q.pop();
-                    if (curr->left != NULL) {
-                        q.push(curr->left);
-                    }
-                    if (curr->right != NULL) {
-                        q.push(curr->right);
-                    }
+                if (curr->right != NULL) {
+                    q.push(curr->right);
                 }
-                flag = 1;
-                reverse(temp.begin(), temp.end());
             }
+            // }
+            if (!flag)
+                reverse(temp.begin(), temp.end());
+            flag = !flag;
             ans.push_back(temp);
         }
         return ans;
