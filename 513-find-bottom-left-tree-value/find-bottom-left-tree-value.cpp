@@ -17,24 +17,20 @@ public:
         if (root == NULL) {
             return 0;
         }
-        queue<pair<TreeNode*, int>> q;
-        q.push({root, 0});
+        queue<TreeNode*> q;
+        q.push(root);
         while (!q.empty()) {
             int n = q.size();
             for (int i = 0; i < n; i++) {
-                auto it = q.front();
+                auto node = q.front();
                 q.pop();
-                TreeNode* node = it.first;
-                int dist = it.second;
-                if (dist < minD) {
-                    minD = dist;
+                if (i == 0)
                     num = node->val;
-                }
                 if (node->left) {
-                    q.push({node->left, dist - 1});
+                    q.push(node->left);
                 }
                 if (node->right) {
-                    q.push({node->right, dist - 1});
+                    q.push(node->right);
                 }
             }
         }
