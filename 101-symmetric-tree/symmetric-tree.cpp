@@ -12,31 +12,26 @@
  */
 class Solution {
 public:
-    bool checkSymmetric(TreeNode* leftNode, TreeNode* rightNode) {
-        if (leftNode == NULL && rightNode == NULL) {
+    bool check(TreeNode* left, TreeNode* right) {
+
+        if (left == NULL && right == NULL)
             return true;
-        } else if (leftNode == NULL || rightNode == NULL) {
+
+        if (left == NULL || right == NULL)
             return false;
-        } else if (leftNode->val == rightNode->val) {
-            if (!checkSymmetric(leftNode->left, rightNode->right))
-                return false;
-            if (!checkSymmetric(leftNode->right, rightNode->left))
-                return false;
-            return true;
-        } else {
+
+        if (left->val != right->val)
             return false;
-        }
+
+        return check(left->left, right->right) &&
+               check(left->right, right->left);
     }
+
     bool isSymmetric(TreeNode* root) {
-        if (root == NULL) {
-            return false;
-        }
-        if (root->left == NULL && root->right == NULL) {
+
+        if (root == NULL)
             return true;
-        }
-        if (root->left == NULL || root->right == NULL) {
-            return false;
-        }
-        return checkSymmetric(root->left, root->right);
+
+        return check(root->left, root->right);
     }
 };
