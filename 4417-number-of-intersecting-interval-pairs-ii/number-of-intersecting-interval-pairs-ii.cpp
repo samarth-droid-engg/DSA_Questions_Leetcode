@@ -1,17 +1,29 @@
 class Solution {
 public:
     long long countIntersectingIntervals(vector<vector<int>>& intervals) {
-        long long count = 0;
-        sort(intervals.begin(), intervals.end());
-        priority_queue<int, vector<int>, greater<int>> pq;
-        for (auto& it : intervals) {
-            int start = it[0], end = it[1];
-            while (!pq.empty() && pq.top() < start) {
-                pq.pop();
-            }
-            count += pq.size();
-            pq.push(end);
+        int n = intervals.size();
+
+        vector<int> ends;
+
+        for (auto& interval : intervals) {
+            ends.push_back(interval[1]);
         }
-        return count;
+
+        sort(ends.begin(), ends.end());
+
+        long long nonIntersecting = 0;
+
+        for (auto& it : intervals) {
+            int start = it[0];
+
+            int count =
+                lower_bound(ends.begin(), ends.end(), start) - ends.begin();
+
+            nonIntersecting += count;
+        }
+
+        long long totalPairs = 1LL * n * (n - 1) / 2;
+
+        return totalPairs - nonIntersecting;
     }
 };
